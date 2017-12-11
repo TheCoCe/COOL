@@ -13,6 +13,11 @@ public class Level : MonoBehaviour {
     private float hotTileTemperature;
     [SerializeField]
     private float difficulty = 1f;
+    [SerializeField]
+    private int sizeX, sizeY;
+    private GridTile[,] array;
+    [SerializeField]
+    private GameObject tileContainer;
     #endregion
 
     #region Properties
@@ -31,7 +36,21 @@ public class Level : MonoBehaviour {
     public static event WinCondition OnGameLost;
 
     void Start () {
-		
+        array = new GridTile[sizeX, sizeY];
+        foreach(Transform child in tileContainer.transform)
+        {
+            int childX, childY;
+            childX = Mathf.RoundToInt(child.position.x);
+            childY = Mathf.RoundToInt(child.position.y);
+            if (childX <= sizeX && childY <= sizeY)
+            {
+                if(array[childX, childY] != null)
+                {
+                    continue;
+                }
+                array[childX, childY] = child.GetComponent<GridTile>();
+            }
+        }
 	}
 
     private void FixedUpdate()
@@ -63,6 +82,18 @@ public class Level : MonoBehaviour {
             currentHotTileCount--;
             currentTemp = currentHotTileCount * hotTileTemperature * difficulty;
         }
+    }
+
+    public HeatableTile GetHeatableTile(Vector3Int position)
+    {
+        if(position.x <= sizeX && position.y <= sizeY)
+        {
+            if (array[position.x, position.y] != null && array[position.x, position.y] is HeatableTile)
+            {
+                return array[position.x, position.y] as HeatableTile;
+            }
+        }
+        return null;
     }
 
     private float InverseLerp(float min, float max, float value)

@@ -1,28 +1,28 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-public class HeatableTile : Tile
+
+public class HeatableTile : GridTile
 {
     [SerializeField]
-    private float inflammability;
-    [SerializeField]
     private uint ticksToHeatAgain;
-
+    [SerializeField]
     private bool heated;
     private uint ticks;
+    [SerializeField]
+    private Sprite[] sprites;
+    private SpriteRenderer sr;
 
-    public float Inflammability
+    private void Awake()
     {
-        get
-        {
-            return inflammability;
-        }
+        sr = this.GetComponent<SpriteRenderer>();
+        if (heated)
+            sr.sprite = sprites[2];
+        else
+            sr.sprite = sprites[0];
     }
 
-    public override void RefreshTile(Vector3Int location, ITilemap tilemap)
+    public void Update()
     {
         //If Tile is heated it heats surrounding Tiles
         if (heated)
@@ -30,15 +30,16 @@ public class HeatableTile : Tile
             for (int x = -1; x <= 1; x++)
                 for (int y = -1; y <= 1; y++)
                 {
-                    Vector3Int position = new Vector3Int(location.x + x, location.y + y, location.z);
-                    HeatableTile temp = GetHeatableTile(tilemap, location);
-                    if (temp != null && !temp.heated && temp.Inflammability >= Random.value)
-                        temp.RefreshTile(position, tilemap);
+                    Vector3Int position = new Vector3Int(Mathf.RoundToInt(transform.position.x) + x,
+                        Mathf.RoundToInt(transform.position.y + y), 0);
+                    HeatableTile temp = Level.instance.GetHeatableTile(position);
+                    if (temp != null && !temp.heated && Level.instance.IgniteNeighbourTilePercent >= Random.value)
+                        temp.HeatUp();
                 }
         }
         else if(ticks > ticksToHeatAgain)
         {
-            heated = true;
+            sr.sprite = sprites[0];
         }
         else
         {
@@ -46,35 +47,27 @@ public class HeatableTile : Tile
         }
     }
 
-    public override void GetTileData(Vector3Int location, ITilemap tilemap, ref TileData tileData)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        tileData.sprite = this.sprite;
-        tileData.color = this.color;
-        tileData.transform.SetTRS(Vector3.zero, Quaternion.identity, Vector3.one);
-        tileData.gameObject = this.gameObject;
-        tileData.flags = this.flags;
-
-        tileData.colliderType = this.colliderType;
+        if(collision.gameObject.layer == 9 && heated)
+        {
+            CoolDown();
+        }
     }
 
-    private HeatableTile GetHeatableTile(ITilemap tilemap, Vector3Int position)
+    public void HeatUp()
     {
-        TileBase temp = tilemap.GetTile(position);
-        if (temp == this)
-            return (HeatableTile)temp;
-        else
-            return null;
+        if (ticks > ticksToHeatAgain)
+        {
+            heated = true;
+            sr.sprite = sprites[2];
+        }
     }
 
-#if UNITY_EDITOR
-    // The following is a helper that adds a menu item to create a RoadTile Asset
-    [MenuItem("Assets/Create/HeatableTile")]
-    public static void CreateHeatableTile()
+    public void CoolDown()
     {
-        string path = EditorUtility.SaveFilePanelInProject("Save Heatable Tile", "NewHeatableTile", "Asset", "Save Heatable Tile", "Assets");
-        if (path == "")
-            return;
-        AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<HeatableTile>(), path);
+        heated = false;
+        ticks = 0;
+        sr.sprite = sprites[1];
     }
-#endif
 }
