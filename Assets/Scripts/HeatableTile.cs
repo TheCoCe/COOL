@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-public class HeatableTile : Tile
+
+public class HeatableTile : GridTile
 {
     [SerializeField]
     private float inflammability;
@@ -22,7 +20,7 @@ public class HeatableTile : Tile
         }
     }
 
-    public override void RefreshTile(Vector3Int location, ITilemap tilemap)
+    public void Update()
     {
         //If Tile is heated it heats surrounding Tiles
         if (heated)
@@ -33,12 +31,8 @@ public class HeatableTile : Tile
                     Vector3Int position = new Vector3Int(location.x + x, location.y + y, location.z);
                     HeatableTile temp = GetHeatableTile(tilemap, location);
                     if (temp != null && !temp.heated && temp.Inflammability >= Random.value)
-                        temp.RefreshTile(position, tilemap);
+                        temp.HeatUp(position, tilemap);
                 }
-        }
-        else if(ticks > ticksToHeatAgain)
-        {
-            heated = true;
         }
         else
         {
@@ -46,35 +40,11 @@ public class HeatableTile : Tile
         }
     }
 
-    public override void GetTileData(Vector3Int location, ITilemap tilemap, ref TileData tileData)
+    public void HeatUp()
     {
-        tileData.sprite = this.sprite;
-        tileData.color = this.color;
-        tileData.transform.SetTRS(Vector3.zero, Quaternion.identity, Vector3.one);
-        tileData.gameObject = this.gameObject;
-        tileData.flags = this.flags;
-
-        tileData.colliderType = this.colliderType;
+        if (ticks > ticksToHeatAgain)
+        {
+            heated = true;
+        }
     }
-
-    private HeatableTile GetHeatableTile(ITilemap tilemap, Vector3Int position)
-    {
-        TileBase temp = tilemap.GetTile(position);
-        if (temp == this)
-            return (HeatableTile)temp;
-        else
-            return null;
-    }
-
-#if UNITY_EDITOR
-    // The following is a helper that adds a menu item to create a RoadTile Asset
-    [MenuItem("Assets/Create/HeatableTile")]
-    public static void CreateHeatableTile()
-    {
-        string path = EditorUtility.SaveFilePanelInProject("Save Heatable Tile", "NewHeatableTile", "Asset", "Save Heatable Tile", "Assets");
-        if (path == "")
-            return;
-        AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<HeatableTile>(), path);
-    }
-#endif
 }

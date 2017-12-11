@@ -65,6 +65,15 @@ public class Level : MonoBehaviour {
         }
     }
 
+    public HeatableTile GetHeatableTile(ITilemap tilemap, Vector3Int position)
+    {
+        TileBase temp = tilemap.GetTile(position);
+        if (temp == this)
+            return (HeatableTile)temp;
+        else
+            return null;
+    }
+
     private float InverseLerp(float min, float max, float value)
     {
         if(min != max)
