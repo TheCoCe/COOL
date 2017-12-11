@@ -46,6 +46,17 @@ public class HeatableTile : Tile
         }
     }
 
+    public override void GetTileData(Vector3Int location, ITilemap tilemap, ref TileData tileData)
+    {
+        tileData.sprite = this.sprite;
+        tileData.color = this.color;
+        tileData.transform.SetTRS(Vector3.zero, Quaternion.identity, Vector3.one);
+        tileData.gameObject = this.gameObject;
+        tileData.flags = this.flags;
+
+        tileData.colliderType = this.colliderType;
+    }
+
     private HeatableTile GetHeatableTile(ITilemap tilemap, Vector3Int position)
     {
         TileBase temp = tilemap.GetTile(position);
@@ -60,7 +71,7 @@ public class HeatableTile : Tile
     [MenuItem("Assets/Create/HeatableTile")]
     public static void CreateHeatableTile()
     {
-        string path = EditorUtility.SaveFilePanelInProject("Save Heatable Tile", "New Heatable Tile", "Asset", "Save Heatable Tile", "Assets");
+        string path = EditorUtility.SaveFilePanelInProject("Save Heatable Tile", "NewHeatableTile", "Asset", "Save Heatable Tile", "Assets");
         if (path == "")
             return;
         AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<HeatableTile>(), path);
