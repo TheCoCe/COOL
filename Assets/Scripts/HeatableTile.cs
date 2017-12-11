@@ -17,7 +17,10 @@ public class HeatableTile : GridTile
     {
         sr = this.GetComponent<SpriteRenderer>();
         if (heated)
+        {
+            Level.instance.IncrementHotTileCount();
             sr.sprite = sprites[2];
+        }
         else
             sr.sprite = sprites[0];
     }
@@ -59,6 +62,7 @@ public class HeatableTile : GridTile
     {
         if (ticks > ticksToHeatAgain)
         {
+            Level.instance.IncrementHotTileCount();
             heated = true;
             sr.sprite = sprites[2];
         }
@@ -66,6 +70,7 @@ public class HeatableTile : GridTile
 
     public void CoolDown()
     {
+        Level.instance.DecrementHotTileCount();
         heated = false;
         ticks = 0;
         sr.sprite = sprites[1];

@@ -15,7 +15,7 @@ public class Level : MonoBehaviour {
     private float difficulty = 1f;
     [SerializeField]
     private int sizeX, sizeY;
-    private GridTile[,] array;
+    private HeatableTile[,] array;
     [SerializeField]
     private GameObject tileContainer;
     #endregion
@@ -35,8 +35,14 @@ public class Level : MonoBehaviour {
     public static event WinCondition OnGameWon;
     public static event WinCondition OnGameLost;
 
+    private void Awake()
+    {
+        instance = this;
+        currentHotTileCount = 0;
+    }
+
     void Start () {
-        array = new GridTile[sizeX, sizeY];
+        array = new HeatableTile[sizeX, sizeY];
         foreach(Transform child in tileContainer.transform)
         {
             int childX, childY;
@@ -48,7 +54,9 @@ public class Level : MonoBehaviour {
                 {
                     continue;
                 }
-                array[childX, childY] = child.GetComponent<GridTile>();
+                HeatableTile temp = child.GetComponent<HeatableTile>();
+                if (temp != null)
+                    array[childX, childY] = temp;
             }
         }
 	}
@@ -88,9 +96,9 @@ public class Level : MonoBehaviour {
     {
         if(position.x <= sizeX && position.y <= sizeY)
         {
-            if (array[position.x, position.y] != null && array[position.x, position.y] is HeatableTile)
+            if (array[position.x, position.y] != null)
             {
-                return array[position.x, position.y] as HeatableTile;
+                return array[position.x, position.y];
             }
         }
         return null;
