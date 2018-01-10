@@ -28,7 +28,7 @@ GameObject:
   - component: {fileID: 114085112019090346}
   - component: {fileID: 114966470928590256}
   - component: {fileID: 114398335007804762}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Character
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 4435247572617708}
   - component: {fileID: 212181489691901306}
   - component: {fileID: 95801959131132012}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CharAnimator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ GameObject:
   - component: {fileID: 4399935938789770}
   - component: {fileID: 212954061861742968}
   - component: {fileID: 95790123049969422}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: IceGunAnimator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -230,6 +230,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gunTransform: {fileID: 4399935938789770}
+  projectile: {fileID: 1223057675110384, guid: 4e794e56ee41c964ea2a129cb7582b35, type: 2}
+  shotCooldown: 0.1
 --- !u!114 &114550046374117866
 MonoBehaviour:
   m_ObjectHideFlags: 1
